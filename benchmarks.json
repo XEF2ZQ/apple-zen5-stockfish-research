@@ -1,0 +1,104 @@
+{
+  "reviewed": "2026-11-13",
+  "kind": "Heterogeneous published aggregate means; not matched hardware experiments",
+  "stockfish_17_1": [
+    {
+      "cpu": "Ryzen 9 9950X3D",
+      "value": 39844461,
+      "unit": "nodes/s",
+      "published_plus_minus": 1999706,
+      "n": 51
+    },
+    {
+      "cpu": "Ryzen 9 9950X",
+      "value": 34051313,
+      "unit": "nodes/s",
+      "published_plus_minus": 2301117,
+      "n": 43
+    },
+    {
+      "cpu": "Core Ultra 7 270K Plus",
+      "value": 30829082,
+      "unit": "nodes/s",
+      "published_plus_minus": 1319269,
+      "n": 10
+    },
+    {
+      "cpu": "Core Ultra 9 285K",
+      "value": 30242620,
+      "unit": "nodes/s",
+      "published_plus_minus": 454953,
+      "n": 21
+    }
+  ],
+  "llvm_16_ninja": [
+    {
+      "cpu": "Ryzen 9 9950X3D",
+      "value": 270,
+      "unit": "seconds",
+      "published_plus_minus": 17,
+      "n": 31
+    },
+    {
+      "cpu": "Ryzen 9 9950X",
+      "value": 286,
+      "unit": "seconds",
+      "published_plus_minus": 17,
+      "n": 63
+    },
+    {
+      "cpu": "Core Ultra 9 285K",
+      "value": 287,
+      "unit": "seconds",
+      "published_plus_minus": 6,
+      "n": 29
+    }
+  ],
+  "llvm_21_1_ninja": [
+    {
+      "cpu": "Ryzen 9 9950X3D",
+      "value": 296,
+      "unit": "seconds",
+      "published_plus_minus": 9,
+      "n": 16
+    },
+    {
+      "cpu": "Core Ultra 7 270K Plus",
+      "value": 305,
+      "unit": "seconds",
+      "published_plus_minus": 2,
+      "n": 8
+    },
+    {
+      "cpu": "Ryzen 9 9950X",
+      "value": 315,
+      "unit": "seconds",
+      "published_plus_minus": 30,
+      "n": 9
+    },
+    {
+      "cpu": "Core Ultra 9 285K",
+      "value": 331,
+      "unit": "seconds",
+      "published_plus_minus": 19,
+      "n": 9
+    }
+  ],
+  "historical_m4_passmark_average": {
+    "cpu": "Apple M4 Max 16 Core",
+    "integer": 98807,
+    "fp": 101294,
+    "unit": "MOps/s",
+    "snapshot": "2026-10-26"
+  },
+  "originating_apple_llvm_report": {
+    "m4_seconds": 233,
+    "m5_max_seconds": 192,
+    "status": "Exact run configuration and numeric chart not independently recovered"
+  },
+  "sources": {
+    "stockfish_17_1": "https://openbenchmarking.org/performance/test/pts/stockfish/74dee63da9a8d7670c5b5a0630b3e29038978bad",
+    "llvm_16_ninja": "https://openbenchmarking.org/test/pts/build-llvm&eval=bf1f35ed79342701259794a6b00d4ab6c70f07e1",
+    "llvm_21_1_ninja": "https://openbenchmarking.org/performance/test/pts/build-llvm/b5c51b71d5f8de414e2b3a5fc9fcff7ce9db05f1"
+  }
+}

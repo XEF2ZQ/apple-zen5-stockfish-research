@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="720" viewBox="0 0 1180 720" role="img" aria-labelledby="title desc">
+<title id="title">Version-separated public Stockfish and LLVM results</title>
+<desc id="desc">Public aggregate means, not controlled paired hardware measurements. Apple and PassMark results are excluded.</desc>
+<rect width="1180" height="720" fill="#f7f9fc"/>
+<style>text{font-family:Arial,sans-serif;fill:#14213d}.title{font-size:26px;font-weight:700}.sub{font-size:15px}.label{font-size:17px}.value{font-size:17px;font-weight:700}.note{font-size:14px}</style>
+<text x="34" y="44" class="title">One processor ranking is not a universal architecture ranking</text>
+<text x="34" y="72" class="sub">Version-specific public aggregate means • source review: 13 November 2026</text>
+<text x="34" y="124" class="label" font-weight="700">Stockfish 17.1 • million nodes/s • higher is better</text>
+<line x1="300.0" x2="300.0" y1="156" y2="345" stroke="#dae0e9"/>
+<text x="300.0" y="368" class="note" text-anchor="middle">0</text>
+<line x1="480.0" x2="480.0" y1="156" y2="345" stroke="#dae0e9"/>
+<text x="480.0" y="368" class="note" text-anchor="middle">11.25</text>
+<line x1="660.0" x2="660.0" y1="156" y2="345" stroke="#dae0e9"/>
+<text x="660.0" y="368" class="note" text-anchor="middle">22.5</text>
+<line x1="840.0" x2="840.0" y1="156" y2="345" stroke="#dae0e9"/>
+<text x="840.0" y="368" class="note" text-anchor="middle">33.75</text>
+<line x1="1020.0" x2="1020.0" y1="156" y2="345" stroke="#dae0e9"/>
+<text x="1020.0" y="368" class="note" text-anchor="middle">45</text>
+<text x="282" y="186" class="label" text-anchor="end">Ryzen 9 9950X3D</text>
+<rect x="300" y="166" width="637.51" height="28" rx="4" fill="#6e45c2"/>
+<text x="947.51" y="186" class="value">39.844M</text>
+<text x="282" y="235" class="label" text-anchor="end">Ryzen 9 9950X</text>
+<rect x="300" y="215" width="544.82" height="28" rx="4" fill="#6e45c2"/>
+<text x="854.82" y="235" class="value">34.051M</text>
+<text x="282" y="284" class="label" text-anchor="end">Core Ultra 7 270K Plus</text>
+<rect x="300" y="264" width="493.27" height="28" rx="4" fill="#146da8"/>
+<text x="803.27" y="284" class="value">30.829M</text>
+<text x="282" y="333" class="label" text-anchor="end">Core Ultra 9 285K</text>
+<rect x="300" y="313" width="483.88" height="28" rx="4" fill="#146da8"/>
+<text x="793.88" y="333" class="value">30.243M</text>
+<text x="34" y="408" class="label" font-weight="700">LLVM 21.1 / Ninja • seconds • lower is better</text>
+<line x1="300.0" x2="300.0" y1="440" y2="629" stroke="#dae0e9"/>
+<text x="300.0" y="652" class="note" text-anchor="middle">0</text>
+<line x1="480.0" x2="480.0" y1="440" y2="629" stroke="#dae0e9"/>
+<text x="480.0" y="652" class="note" text-anchor="middle">90</text>
+<line x1="660.0" x2="660.0" y1="440" y2="629" stroke="#dae0e9"/>
+<text x="660.0" y="652" class="note" text-anchor="middle">180</text>
+<line x1="840.0" x2="840.0" y1="440" y2="629" stroke="#dae0e9"/>
+<text x="840.0" y="652" class="note" text-anchor="middle">270</text>
+<line x1="1020.0" x2="1020.0" y1="440" y2="629" stroke="#dae0e9"/>
+<text x="1020.0" y="652" class="note" text-anchor="middle">360</text>
+<text x="282" y="470" class="label" text-anchor="end">Ryzen 9 9950X3D</text>
+<rect x="300" y="450" width="592.00" height="28" rx="4" fill="#6e45c2"/>
+<text x="902.00" y="470" class="value">296 s</text>
+<text x="282" y="519" class="label" text-anchor="end">Core Ultra 7 270K Plus</text>
+<rect x="300" y="499" width="610.00" height="28" rx="4" fill="#146da8"/>
+<text x="920.00" y="519" class="value">305 s</text>
+<text x="282" y="568" class="label" text-anchor="end">Ryzen 9 9950X</text>
+<rect x="300" y="548" width="630.00" height="28" rx="4" fill="#6e45c2"/>
+<text x="940.00" y="568" class="value">315 s</text>
+<text x="282" y="617" class="label" text-anchor="end">Core Ultra 9 285K</text>
+<rect x="300" y="597" width="662.00" height="28" rx="4" fill="#146da8"/>
+<text x="972.00" y="617" class="value">331 s</text>
+<text x="34" y="704" class="note">Heterogeneous submissions; no causal attribution. Error fields and sample counts are retained in the article and JSON.</text>
+</svg>

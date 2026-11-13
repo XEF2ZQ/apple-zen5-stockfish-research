@@ -1,0 +1,53 @@
+{
+  "cpu": "Apple M5 Pro 18 Core",
+  "reviewed": "2026-11-13",
+  "scope": "Five recent public baselines exposed on the CPU page; not exhaustive all-time history",
+  "selection": "BL5128734 is highest CPU Mark, Integer Math and Floating Point Math within this inspected set.",
+  "selected_id": "5128734",
+  "submissions": [
+    {
+      "id": "5128869",
+      "date": "2026-11-12",
+      "cpu_mark": 57857,
+      "integer": 135838,
+      "fp": 191383,
+      "url": "https://www.passmark.com/baselines/V11/display.php?id=512886944840"
+    },
+    {
+      "id": "5128830",
+      "date": "2026-11-11",
+      "cpu_mark": 56076,
+      "integer": 134604,
+      "fp": 191012,
+      "url": "https://www.passmark.com/baselines/V11/display.php?id=512883011609"
+    },
+    {
+      "id": "5128734",
+      "date": "2026-11-10",
+      "cpu_mark": 60808,
+      "integer": 136389,
+      "fp": 192536,
+      "version": "11.0.1004",
+      "os": "macOS 27.2",
+      "device": "Mac17,12",
+      "ram_gb": 24,
+      "url": "https://www.passmark.com/baselines/V11/display.php?id=512873464657"
+    },
+    {
+      "id": "5128698",
+      "date": "2026-11-09",
+      "cpu_mark": 57734,
+      "integer": 123598,
+      "fp": 183585,
+      "url": "https://www.passmark.com/baselines/V11/display.php?id=512869812095"
+    },
+    {
+      "id": "5128635",
+      "date": "2026-11-08",
+      "cpu_mark": 56864,
+      "integer": 130532,
+      "fp": 188101,
+      "url": "https://www.passmark.com/baselines/V11/display.php?id=512863530470"
+    }
+  ]
+}
