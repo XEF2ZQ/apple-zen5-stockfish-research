@@ -72,3 +72,15 @@ parts.append('<text x="34" y="704" class="note">Heterogeneous submissions; no ca
 parts.append("</svg>")
 (ROOT / "verified-results.svg").write_text("\n".join(parts), encoding="utf-8")
 print("Validated selected baseline, regenerated CALCULATIONS.md and verified-results.svg")
+
+# Revision examples remain explicitly separate from measured benchmark inputs.
+evidence = json.loads((ROOT / "architecture-evidence.json").read_text(encoding="utf-8"))
+g = evidence["smt_illustration"]["aggregate_gain"]
+assert evidence["smt_illustration"]["per_worker_efficiency"] == g / 2
+with (ROOT / "CALCULATIONS.md").open("a", encoding="utf-8") as audit:
+    audit.write("\n## Revision examples (not measured application gains)\n\n")
+    audit.write(f"- Illustrative SMT aggregate gain: {g:.3f}x, {(g-1)*100:.1f}%.\n")
+    audit.write(f"- Average per-worker efficiency: {g/2:.3f}, {g/2*100:.1f}%.\n")
+    audit.write(f"- Average per-worker progress reduction: {(1-g/2)*100:.1f}%.\n")
+    audit.write("- Byte-dot width ratio: 512/128 = 4; rate ratio is 4*r512/r128.\n")
+    audit.write("- One 512-bit start versus four 128-bit starts gives equal byte-product coverage per cycle.\n")

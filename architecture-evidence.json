@@ -1,0 +1,276 @@
+{
+  "review_date": "2026-11-16",
+  "measurement_status": "External reported measurements; not rerun by this article",
+  "base_m5": {
+    "source": "https://github.com/useless-husband/m5-uarch/blob/main/results/apple-m5/apple-m5.json",
+    "blob_sha": "ae496775ae0f671700284399c388fb54ec103ece",
+    "machine": {
+      "brand": "Apple M5",
+      "model": "Mac17,2",
+      "os_version": "27.0",
+      "os_build": "26A428",
+      "page_size": 16384,
+      "virtual_machine": false,
+      "pauth_keys_active": false,
+      "levels": [
+        {
+          "label": "P",
+          "name": "Super",
+          "cores": 4,
+          "l1i_bytes": 196608,
+          "l1d_bytes": 131072,
+          "l2_bytes": 16777216,
+          "cores_per_l2": 4,
+          "measured": true,
+          "ghz_observed": 4.52
+        },
+        {
+          "label": "E",
+          "name": "Efficiency",
+          "cores": 6,
+          "l1i_bytes": 131072,
+          "l1d_bytes": 65536,
+          "l2_bytes": 6291456,
+          "cores_per_l2": 6,
+          "measured": true,
+          "ghz_observed": 1.6
+        }
+      ]
+    },
+    "instructions": [
+      {
+        "name": "fadd_d",
+        "group": "FP / arithmetic",
+        "ext": "",
+        "asm": "fadd d0, d12, d13",
+        "P": {
+          "tp": [
+            4.001,
+            3.999,
+            4.002
+          ],
+          "lat": [
+            [
+              2.114,
+              2.114,
+              2.114
+            ],
+            [
+              2.114,
+              2.099,
+              2.115
+            ]
+          ]
+        },
+        "E": {
+          "tp": [
+            3,
+            2.999,
+            3
+          ],
+          "lat": [
+            [
+              2.5,
+              2.5,
+              2.557
+            ],
+            [
+              2.5,
+              2.494,
+              2.609
+            ]
+          ]
+        },
+        "paths": [
+          {
+            "from": "R0",
+            "to": "W0",
+            "chain": "fadd d0, d0, d13"
+          },
+          {
+            "from": "R1",
+            "to": "W0",
+            "chain": "fadd d0, d12, d0"
+          }
+        ]
+      },
+      {
+        "name": "fmul_d",
+        "group": "FP / arithmetic",
+        "ext": "",
+        "asm": "fmul d0, d12, d13",
+        "P": {
+          "tp": [
+            3.999,
+            3.999,
+            4.001
+          ],
+          "lat": [
+            [
+              3,
+              2.999,
+              3.001
+            ],
+            [
+              3,
+              2.999,
+              3.001
+            ]
+          ]
+        },
+        "E": {
+          "tp": [
+            3,
+            2.999,
+            3.001
+          ],
+          "lat": [
+            [
+              3.501,
+              3.493,
+              3.688
+            ],
+            [
+              3.5,
+              3.438,
+              3.507
+            ]
+          ]
+        },
+        "paths": [
+          {
+            "from": "R0",
+            "to": "W0",
+            "chain": "fmul d0, d0, d13"
+          },
+          {
+            "from": "R1",
+            "to": "W0",
+            "chain": "fmul d0, d12, d0"
+          }
+        ]
+      },
+      {
+        "name": "sdot_4s",
+        "group": "SIMD / dot product",
+        "ext": "DotProd",
+        "asm": "sdot v0.4s, v12.16b, v13.16b",
+        "P": {
+          "tp": [
+            3.441,
+            3.426,
+            3.471
+          ],
+          "lat": [
+            [
+              3,
+              2.999,
+              3.001
+            ],
+            [
+              3.001,
+              3,
+              3.001
+            ],
+            [
+              3,
+              2.999,
+              3.001
+            ]
+          ]
+        },
+        "E": {
+          "tp": [
+            2.999,
+            2.966,
+            3
+          ],
+          "lat": [
+            [
+              3,
+              2.993,
+              3
+            ],
+            [
+              3,
+              2.997,
+              3.006
+            ],
+            [
+              3,
+              2.999,
+              3
+            ]
+          ]
+        },
+        "paths": [
+          {
+            "from": "RW0",
+            "to": "RW0",
+            "chain": "sdot v0.4s, v12.16b, v13.16b"
+          },
+          {
+            "from": "R0",
+            "to": "RW0",
+            "tied": true,
+            "chain": "sdot v0.4s, v0.16b, v13.16b"
+          },
+          {
+            "from": "R1",
+            "to": "RW0",
+            "tied": true,
+            "chain": "sdot v0.4s, v12.16b, v0.16b"
+          }
+        ]
+      }
+    ]
+  },
+  "ixbt_latency_ns": {
+    "source": "https://www.ixbt.com/platform/amd-ryzen-9-9950x3d-zen5-review.html",
+    "rows": [
+      {
+        "cpu": "9950X3D",
+        "ddr5": 6000,
+        "l1": 0.7,
+        "l2": 2.5,
+        "l3": 11.9,
+        "dram": 79.9
+      },
+      {
+        "cpu": "9950X3D",
+        "ddr5": 5200,
+        "l1": 0.7,
+        "l2": 2.5,
+        "l3": 12,
+        "dram": 88.9
+      },
+      {
+        "cpu": "9950X",
+        "ddr5": 5200,
+        "l1": 0.7,
+        "l2": 2.5,
+        "l3": 10.6,
+        "dram": 77.8
+      }
+    ]
+  },
+  "smt_illustration": {
+    "status": "Illustrative, not measured",
+    "aggregate_gain": 1.25,
+    "per_worker_efficiency": 0.625
+  },
+  "source_blobs": [
+    {
+      "repo": "official-stockfish/Stockfish",
+      "tag": "sf_17.1",
+      "path": "src/nnue/layers/affine_transform.h",
+      "sha": "dac727e23bcd04200666938a62af24f197444592"
+    },
+    {
+      "repo": "official-stockfish/Stockfish",
+      "tag": "sf_17.1",
+      "path": "src/nnue/layers/affine_transform_sparse_input.h",
+      "sha": "be5e30b5e2fd63f937bef1b3334d1ab395330990"
+    }
+  ]
+}

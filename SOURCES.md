@@ -25,3 +25,20 @@ Reviewed 13 November 2026. The README is the complete article and contains the s
 | m5-uarch | main / README.md | 037aeef763c884574474717ac2cb045d2467d6ea |
 
 Blob SHAs identify file contents, not repository commits. The m5-uarch source concerns the base M5; its E-core is not the new M5 Pro/Max secondary performance core.
+
+## 16 November revision audit
+
+The benchmark snapshot remains 13 November. The additional evidence is retained in architecture-evidence.json, and REVISION-NOTES.md maps the pasted review to the completed changes.
+
+| Source | Tag / path | Retrieved blob SHA |
+|---|---|---|
+| Stockfish | sf_17.1 / src/nnue/layers/affine_transform.h | dac727e23bcd04200666938a62af24f197444592 |
+| Stockfish | sf_17.1 / src/nnue/layers/affine_transform_sparse_input.h | be5e30b5e2fd63f937bef1b3334d1ab395330990 |
+| m5-uarch | main / results/apple-m5/apple-m5.json | ae496775ae0f671700284399c388fb54ec103ece |
+
+- The base-M5 data identifies Mac17,2 with four Super and six Efficiency cores. Its FP and dot-product values are not measurements of the new twelve-core Pro/Max performance-core group.
+- iXBT's first-hand 9950X3D review supplies the separately labeled AIDA64 latency table. Nanoseconds are not converted to cycles using advertised boost clocks, and the systems are not identified as the Stockfish aggregate systems.
+- Chips and Cheese's four-cycle V-Cache penalty was measured on 9800X3D. It is explicitly context, not a 9950X3D rerun.
+- AMD's Hot Chips slides 6-8 describe SMT decode assignment and 448/224 1T/2T window entries. The SMT example is illustrative, not a measured scaling result.
+- The PNG has three separate panels for Stockfish 17.1, LLVM 16.0 and LLVM 21.1; no result is pooled across versions. The original SVG remains available and has two panels.
+- The pasted review's proposed causal explanations were checked rather than treated as measurements. Neither a FAANG certification nor principal-review approval is claimed.

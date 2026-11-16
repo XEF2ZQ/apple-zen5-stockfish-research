@@ -5,7 +5,7 @@
 **Ryzen 9 9950X3D · Ryzen 9 9950X · Core Ultra 7 270K Plus · Core Ultra 9 285K**  
 **PassMark case study: M5 Pro, specifically the 18-core model, using individual reported results.**  
 Originating architectural analysis: **Peter Kosanyi** · Research synthesis: **OpenAI Codex**  
-Evidence reviewed: **13 November 2026** · Method: public-result audit, source-code analysis, and explicit throughput models
+Revision: **16 November 2026** · Benchmark snapshot: **13 November 2026** · Method: public-result audit, source-code analysis, and explicit throughput models
 
 > **The central finding:** a wider scalar front end and more general integer ALUs do not require an Apple CPU to win Stockfish. Modern Stockfish combines irregular chess search with quantized integer neural-network evaluation. Its useful work per cycle depends on instruction-specific vector kernels, bitboard indexing, cache locality, sustained clocks, and parallel utilization.
 
@@ -31,7 +31,7 @@ The intended AMD models are **9950X3D and 9950X**, correcting the shortened spok
 
 ### The originating benchmark-derived findings
 
-Peter's calculations are part of the research record. The table preserves them and identifies where independently retrieved measurements use another definition or differ. This is a provenance audit, not a characterization of the originating work as imaginary.
+Peter's calculations are part of the research record. The table preserves them and identifies where independently retrieved measurements use another definition or differ. The comparison keeps the contributor's calculations visible alongside independently reproducible evidence.
 
 | Feature | Originating finding or estimate | Independent evidence and treatment |
 |---|---|---|
@@ -81,9 +81,13 @@ Those records establish identifiable submissions, not an exact Apple-to-Ryzen th
 
 Version matching is essential. The retrieved Stockfish 17 Phoronix install recipe uses `bench 4096 $NUM_CPU_CORES 26`; the profile history states that 17.1 switches to the built-in `speedtest`. Engine/network changes and different benchmark procedures preclude pooling their NPS figures. [PTS17, PTSREV, SFBENCH]
 
-![Version-separated public results](verified-results.svg)
+### Version-separated public results
 
-*The panels show separate workloads and units. They exclude unverified Apple scores and all PassMark data.*
+![Stockfish 17.1 and LLVM 16.0/21.1 public means, in separate panels](verified-results.png)
+
+[Open the full-resolution chart](verified-results.png) · [Scalable SVG, Stockfish 17.1 and LLVM 21.1](verified-results.svg)
+
+*Each panel has its own version, units and direction of improvement. Bars are public means; no paired uncertainty or causal decomposition is implied. The tables in Sections 2 and 6 retain exact numbers, published ± fields and submission counts. Apple scores and PassMark are excluded. The chart now includes LLVM 16.0 as a separate panel as well as LLVM 21.1.*
 
 ## 3. Exclusive architectural analysis
 
@@ -168,6 +172,46 @@ Sources: M4, Z5. Family-level shared-cache measurements retain their scope rathe
 
 Likewise, BTB capacity does not establish conditional-branch direction accuracy. Target lookup, branch history, aliasing, taken-branch delivery and recovery latency all matter. No unsupported Apple-versus-Zen BTB ranking is required to explain the workload.
 
+### 3.6 Cache topology and latency: the comparable quantities
+
+Capacity helps only when it changes the location or concurrency of useful accesses. The hierarchy below distinguishes per-core caches from shared structures.
+
+| Structure | Apple M4 family / M4 Max scope | Ryzen 9 9950X / 9950X3D scope |
+|---|---|---|
+| L1I / L1D | P: 192 / 128 KiB; E: 128 / 64 KiB | 32 / 48 KiB per core |
+| L2 | M4 P cluster: 16 MiB; E cluster: 4 MiB, shared within the cluster | 1 MiB private per core; 16 MiB package total |
+| Outer cache | M4 Max: 48 MiB system-level memory cache reported in the M4 study's guide-derived table | 9950X: two 32 MiB CCD-local L3 domains; 9950X3D: 96 + 32 MiB |
+| Basic dependent L1 hit | M4 pointer-to-base chain: 3 cycles; load-to-ALU or indexed dependency: 4 | AMD specifies 4-cycle load-to-use |
+| Matched L2 / outer-cache latency comparison | Not established for these exact Apple and Ryzen configurations | See the independently measured desktop rows below |
+
+Sources: M4, Z5, D3D, D9950. Apple cache sizes above retain family or Max scope; they are not inferred from an M5 score. A 48 MiB SLC serves an SoC hierarchy and must not be treated as a 48 MiB private CPU L3. Likewise, 128 MiB total Ryzen L3 is not a single uniformly local cache.
+
+A first-hand iXBT review reports the following AIDA64 latency measurements, in **nanoseconds**, for its identified desktop configurations. These are a separate synthetic experiment, not the Stockfish systems and not an ARM-versus-x86 throughput comparison. [IXLAT]
+
+| System / DRAM data rate | L1 | L2 | L3 | DRAM |
+|---|---:|---:|---:|---:|
+| 9950X3D / DDR5-6000 | 0.7 ns | 2.5 ns | 11.9 ns | 79.9 ns |
+| 9950X3D / DDR5-5200 | 0.7 ns | 2.5 ns | 12.0 ns | 88.9 ns |
+| 9950X / DDR5-5200 | 0.7 ns | 2.5 ns | 10.6 ns | 77.8 ns |
+
+The cache can help despite a slower hit: replacing a DRAM access with an L3 hit saves more time than a small additional L3 hit cost loses. Chips and Cheese measures a four-cycle V-Cache L3 penalty on **9800X3D**, useful Zen 5 context rather than a new 9950X3D measurement. [VCMEAS] No cycles are reverse-engineered from these rounded nanosecond values using advertised boost clocks.
+
+For intuition, define h as the fraction of accesses reaching a cache that hit there, H as its lookup time, and P as the additional miss penalty. A simple serial model is **T = H + (1 − h)P**. Capacity changes h; it need not reduce H. Real Stockfish adds overlapping misses, prefetching, coherence and dependent chains. Measure those effects rather than assigning the complete 17.0% aggregate NPS difference to V-Cache.
+
+### 3.7 What instruction measurements establish about M5's new cores
+
+The retrieved m5-uarch dataset identifies **Apple M5, Mac17,2, four Super and six Efficiency cores**. Its E column therefore does **not** measure the twelve new performance cores in M5 Pro/Max. Inspecting latency data cannot remove that device mismatch. [M5DATA]
+
+| Base-M5 instruction | Super: measured starts/cycle | Efficiency: measured starts/cycle | Data-flow latency, Super / Efficiency |
+|---|---:|---:|---|
+| Scalar FP64 add, `fadd d` | 4.001 | 3.000 | About 2.11 / 2.50 cycles |
+| Scalar FP64 multiply, `fmul d` | 3.999 | 3.000 | About 3.00 / 3.50 cycles |
+| 128-bit signed byte dot, `sdot v.4s` | 3.441 | 2.999 | About 3.00 / 3.00 cycles |
+
+These are the dataset's reported central throughput values, not this article's hardware runs. They show why latency, throughput, general ALU count and FP-path count need separate columns. An instruction can have three-cycle latency while independent instances start several times per cycle.
+
+For the **new Pro/Max performance cores**, the contributor's seven-wide, eight-ALU, four-FP-path reconstruction remains in the record. To identify sharing, measure isolated add/multiply/dot streams, then mixed pairs on a verified core type. Loss of combined throughput can expose a shared port, register-read bottleneck or admission limit; unchanged latency alone cannot prove dedicated units. Retain per-core-type cycle counts and disassembly, and vary register sources and accumulator count. Apple's public profiling workflow distinguishes instruction delivery, processing, discarded work and useful execution. [APROF]
+
 ## 4. Why Stockfish can favor Zen 5
 
 ### 4.1 Integer-heavy includes neural SIMD
@@ -182,6 +226,28 @@ The tagged affine-layer source uses unsigned byte inputs, signed byte weights an
 A 512-bit byte-dot instruction processes four times the vector width of a 128-bit instruction. That is a width ratio, not a fourfold application speedup. Eligible issue rates, signedness handling, sparsity, reduction work and loads affect the kernel; scalar search remains around it.
 
 Architecture-specific implementations can perform the same evaluation with different instruction counts. A native Zen VNNI512 binary and a native Apple NEON-dot binary need not do identical machine work. An inappropriate build target can harm either platform.
+
+#### 4.1.1 Exact source paths: VNNI, AVX2 and NEON dot products
+
+The audit now follows **sf_17.1 throughout**, including its affine and sparse-input layers. The table describes source-selected operations; it is not disassembly from the public benchmark submissions. [SFAFF17, SFSPARSE, SFSIMD, SFMAKE]
+
+| Build / feature path | Core arithmetic in the SIMD helper | Work in one dot instruction | Consequence |
+|---|---|---|---|
+| `x86-64-vnni512` | `_mm512_dpbusd_epi32` → `VPDPBUSD` with ZMM operands | 64 byte products accumulated into 16 int32 lanes | 512-bit AVX-512 VNNI path available to desktop Zen 5 |
+| `x86-64-vnni256` / `x86-64-avxvnni` | `_mm256_dpbusd_epi32` → corresponding 256-bit dot form | 32 byte products into 8 int32 lanes | VNNI availability and instruction encoding must match the actual CPU/build |
+| AVX2 without VNNI | `maddubs`, `madd`, then int32 add | Multi-instruction emulation of the dot accumulation | “AVX2” alone does not identify whether VNNI is enabled |
+| `apple-silicon`, NEON dot enabled | `vdotq_s32` → `SDOT` | 16 signed-byte products into 4 int32 lanes | Native 128-bit NEON dot path; not an AMX dispatch |
+| NEON without dot extension | Widening byte multiply and pairwise accumulation | Several operations replace a dot instruction | A fallback can change instruction cost materially |
+
+The Makefile enables dot-product support for Apple silicon. On x86, AVX-512 VNNI is the relevant name here; **AVX10 is not needed to explain this Zen 5 build**. The 270K Plus should also be checked with its eligible AVX-VNNI target rather than assumed to execute a plain AVX2 emulation path.
+
+The selected x86 helper accumulates unsigned-byte × signed-byte products. The NEON helper uses signed-byte dot products; compatible activation ranges and the surrounding quantized representation matter. This is a code-path comparison, not permission to substitute arbitrary unsigned data into `SDOT`.
+
+A 512-bit instruction covers four times the bytes of a 128-bit instruction. If eligible start rates are r512 and r128, the dot-product ceiling ratio is **4 r512 / r128**, before clocks, loads and reductions. Four NEON starts per cycle can match one 512-bit start in this narrow accounting. The actual rate of this instruction class must be measured; counting FP FMA pipes does not establish it.
+
+The sparse-input layer also locates nonzero blocks, builds masks and processes selected input chunks. In its nonzero-detection code, AVX-512 uses a compare-to-mask operation while NEON forms a mask through test, AND and horizontal addition. The affine layer has output-dimension-specific branches, so not every layer uses the widest helper. Register pressure, data layout and sparsity are part of the kernel cost.
+
+The audit found NEON and x86 SIMD paths in these tagged files, **not an AMX or SME implementation of these NNUE layers**. AMX is not a 128-bit NEON block, and availability of SME or a matrix accelerator does not automatically offload C++ vector intrinsics. A matrix backend would need a deliberate implementation and validation of quantization, dimensions, incremental updates and dispatch overhead.
 
 ### 4.2 PEXT changes the scalar instruction sequence
 
@@ -200,6 +266,29 @@ The 9950X3D has 128 MB total L3, versus 64 MB for 9950X. Their 17.0% aggregate N
 Two hardware contexts share a Zen core. When one waits on a dependency or miss, its sibling can provide ready work. SMT does not duplicate the ALUs or guarantee a fixed multiplier. Its contribution needs sixteen-versus-thirty-two-worker measurements on the same Ryzen, with placement and effective clocks recorded.
 
 Parallel search also changes the tree explored. More NPS is not automatically the same percentage of stronger chess, less time to solve, or greater search efficiency. Keep node count, wall time and search limits alongside NPS.
+
+#### 4.4.1 SMT gain, per-worker penalty and physical-core scaling
+
+Zen 5's two threads share execution and cache resources. AMD's design presentation specifies a 448-entry retirement window in 1T mode and 224 entries per thread in 2T mode; SMT assigns each thread a decode pipe. Thus a second worker can improve aggregate utilization while reducing the resources and progress available to either worker individually. [Z5]
+
+Let N16 and N32 be NPS with sixteen and thirty-two workers on the **same sixteen-core Ryzen**, with one worker per core in the sixteen-worker run:
+
+- Aggregate SMT gain: **G = N32 / N16**.
+- Gain above physical-core-only operation: **100(G − 1)%**.
+- Average per-worker efficiency relative to sixteen workers: **N32 / (2N16) = G/2**.
+
+For illustration only, G = 1.25 means **25% more aggregate NPS**, **62.5% per-worker efficiency**, and **37.5% lower average progress per worker**. These are compatible outcomes. They are not measured SMT figures for this paper. Contention for vector ports, queues, cache capacity and memory bandwidth can reduce or reverse the aggregate gain.
+
+| Scaling question | Same-system experiment | Interpretation limit |
+|---|---|---|
+| Ryzen SMT | 1, 8, 16 and 32 workers; record exact CCD/core placement | 32/16 isolates worker configuration only when clocks, placement and other conditions are controlled |
+| M4 Max secondary-core contribution | Verified P-only versus P+E execution, with residency recorded | Worker count alone does not prove which cores executed the work |
+| M5 Pro/Max secondary-core contribution | Verified six-super-only versus six-super-plus-twelve-performance execution | These are physical cores, not SMT siblings or the base-M5 E-core |
+| Intel heterogeneous scaling | Verified P-only, E-only and combined execution | Shared fabric, power and thread assignment can change effective core rates |
+
+Adding a physical core adds execution resources; adding an SMT sibling mainly exposes another instruction stream to shared resources. Both can increase useful work, but neither yields a universal multiplier. Apple and Intel worker sweeps require scheduler telemetry: macOS QoS is a placement hint, not proof of hard affinity.
+
+Stockfish workers interact through shared search information and the transposition table, so NPS scaling also reflects changing search work and cache/coherence traffic. Report repeatability, total nodes, elapsed time and a fixed-work or fixed-position metric. The present aggregate data cannot determine how many percentage points of the cross-platform gap come from SMT.
 
 ### 4.5 The Intel result is coherent
 
@@ -302,6 +391,42 @@ The retrieved historical LLVM 16 recipe selects Release, disables test/benchmark
 
 Match source version, bootstrap compiler, linker, projects, target backends, assertions, debug information, caches, RAM and source patches. LLVM's official build guide explicitly explains several of these configuration choices. Building LLVM 16 with a newer compiler is still a build of LLVM 16: source version and bootstrap compiler version are separate variables. [LLVM]
 
+### 6.4 Compilation as a second workload: mechanisms to test
+
+Compilation is not uniformly bandwidth-bound. Different phases can stress different parts of the machine, and a high bandwidth specification alone does not identify the limiting phase.
+
+| Build phase | Likely pressure to investigate | Evidence that would support it |
+|---|---|---|
+| Preprocessing / parsing / template work | Irregular loads, allocation, code footprint, branches | Hot-function profile, cache/TLB misses, stalled cycles and branch misses |
+| IR optimization / code generation | Graph traversal, dependent integer work, compiler instruction mix | Per-file timing, instruction-delivery versus execution stalls |
+| Parallel translation units | Aggregate core throughput and concurrent working sets | Job-count sweep, effective clocks, peak resident memory, page faults |
+| Table generation / long final jobs | Limited available parallelism and single-job latency | Build-graph timing and the longest remaining commands |
+| Linking / object-file handling | Linker implementation, memory pressure, filesystem behavior | Separate link duration, I/O activity, RSS and swap telemetry |
+
+A large Apple instruction cache can reduce refetching of hot compiler code. A large out-of-order window can overlap independent loads or operations, and a shared L2 can retain a broader working set. These are mechanisms to test, **not measurements demonstrating that those structures caused the reported 233/192-second Apple results**. A deep window cannot accelerate a fully dependent chain indefinitely.
+
+For an unchanged build graph, wall time is bounded below by both the critical-path time and the total required work divided by effective parallel processing capacity. More workers help until memory pressure, contention or the serial tail dominates. SMT can help independent compiler processes and also increase their cache/memory competition. Faster physical secondary cores can increase parallel capacity, while faster super cores can shorten the tail.
+
+### 6.5 A reproducible LLVM comparison contract
+
+The two public LLVM versions stay separate. A new controlled campaign should publish the following configuration alongside every individual run. [LLVM]
+
+| Required field | Why it changes the interpretation |
+|---|---|
+| Exact source commit/archive and applied patches | LLVM 16 and LLVM 21 are different workloads |
+| Bootstrap C/C++ compiler and linker, with versions | Same source can generate different compiler workloads and machine code |
+| CMake cache, build type and assertions | Release, Debug and RelWithDebInfo have different cost and memory use |
+| Enabled projects, runtimes and target backends | A full LLVM+Clang build is not interchangeable with the historical LLVM-only recipe |
+| Explicit Ninja jobs and link-job limits | Thread count and peak memory affect time and the final tail |
+| Fresh build directory; compiler caches disabled | An incremental or cached build is not a clean compile |
+| Filesystem, warm/cold policy, RAM and swap | Storage cache and memory exhaustion can dominate a result |
+| Native/cross target policy | Native arm64 and x86_64 builds may perform different target-specific work |
+| Per-run wall time, peak RSS, phase timings and clocks | Distinguishes parallel throughput from link or serial-tail improvement |
+
+Retain `CMakeCache.txt`, `compile_commands.json` where enabled, `.ninja_log`, build output and the full commands. Use `ninja -d stats` for build statistics and compiler timing traces where supported, recording profiling overhead separately. LLVM documents a link-job limit because concurrent link steps can impose substantial memory demand.
+
+The Apple 192/233-second pair remains a **conditional reported comparison**, not a verified entry in the public-result chart. A complete matched dataset would enable a firm workload ranking; architectural plausibility cannot replace that missing record.
+
 ## 7. Experiments that distinguish the causes
 
 | Question | Controlled intervention | Useful evidence |
@@ -340,12 +465,14 @@ The appropriate unit is completed useful work. Apple's width, windows and caches
 
 ## 9. Sources and reproduction
 
-The complete article is this repository's front-page README. Supporting files retain arithmetic inputs and individual-submission provenance. Run **python reproduce.py** to regenerate the calculation audit and SVG figure using only the Python standard library. That reproduces article arithmetic, not physical benchmarks.
+The complete article is this repository's front-page README. Supporting files retain arithmetic inputs and individual-submission provenance. Run **python reproduce.py** to regenerate the calculation audit and SVG figure using only the Python standard library. Run **python render_chart.py** with Pillow installed to regenerate the three-panel PNG. That reproduces article arithmetic, not physical benchmarks.
 
 - [Benchmark inputs](benchmarks.json)
 - [Inspected M5 Pro submissions](passmark-m5-pro.json)
 - [Generated calculations](CALCULATIONS.md)
 - [Evidence and limitations](SOURCES.md)
+- [Revision audit and closure criteria](REVISION-NOTES.md)
+- [Controlled-run reporting template](EXPERIMENT-TEMPLATE.md)
 
 | Reference | Primary source or first-hand experiment |
 |---|---|
@@ -378,3 +505,12 @@ The complete article is this repository's front-page README. Supporting files re
 | PTS17 / PTSREV | [Historical Stockfish profile recipe](https://github.com/phoronix-test-suite/test-profiles/blob/master/pts/stockfish-1.6.0/install.sh) / [profile history](https://openbenchmarking.org/test/pts/stockfish) |
 | PTSL | [LLVM 16 profile setup](https://github.com/phoronix-test-suite/test-profiles/blob/master/pts/build-llvm-1.5.0/pre.sh) |
 | LLVM / PX270 | [LLVM build guide](https://llvm.org/docs/GettingStarted.html) / [270K Plus compilation review](https://www.phoronix.com/review/intel-core-ultra-7-270k-plus/3) |
+
+| Additional reference | Source inspected for the 16 November revision |
+|---|---|
+| SFAFF17 | [Stockfish 17.1 affine layer](https://github.com/official-stockfish/Stockfish/blob/sf_17.1/src/nnue/layers/affine_transform.h) |
+| SFSPARSE | [Stockfish 17.1 sparse-input layer](https://github.com/official-stockfish/Stockfish/blob/sf_17.1/src/nnue/layers/affine_transform_sparse_input.h) |
+| M5DATA | [Base-M5 machine identity and instruction results](https://github.com/useless-husband/m5-uarch/blob/main/results/apple-m5/apple-m5.json) |
+| IXLAT | [iXBT's first-hand 9950X3D measurements](https://www.ixbt.com/platform/amd-ryzen-9-9950x3d-zen5-review.html) |
+| VCMEAS | [Chips and Cheese: 9800X3D V-Cache measurements](https://old.chipsandcheese.com/2024/11/06/amds-9800x3d-2nd-generation-v-cache/) |
+| APROF | [Apple: addressing CPU bottlenecks](https://developer.apple.com/documentation/xcode/addressing-cpu-bottlenecks) |
